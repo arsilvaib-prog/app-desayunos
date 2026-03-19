@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Desayunos Artur</title>
+
+    <link rel="manifest" href="/manifest.json">
+
+    <style>
+    body {
+        font-family: Arial;
+        background: #f5f5f5;
+        text-align: center;
+    }
+
+    h1 {
+        color: #ff9800;
+    }
+
+    .container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .card {
+        background: white;
+        padding: 15px;
+        margin: 10px;
+        border-radius: 10px;
+        width: 280px;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+
+    img {
+        width: 100%;
+        border-radius: 10px;
+    }
+
+    button {
+        background: #ff9800;
+        color: white;
+        padding: 10px;
+        border: none;
+        border-radius: 5px;
+        width: 100%;
+    }
+
+    input {
+        width: 90%;
+        padding: 8px;
+        margin: 5px;
+    }
+    </style>
+</head>
+
+<body>
+
+<h1>🍳 Desayunos Artur</h1>
+
+<form action="/pedido" method="POST">
+<div class="container">
+
+    <div class="card">
+        <img src="/static/chilaquiles.jpg">
+        <h3>
+            <input type="radio" name="producto" value="Chilaquiles" required>
+            Chilaquiles - $50
+        </h3>
+    </div>
+
+    <div class="card">
+        <img src="/static/molletes.jpg">
+        <h3>
+            <input type="radio" name="producto" value="Molletes">
+            Molletes - $40
+        </h3>
+    </div>
+
+<div class="card">
+     <img src="/static/picadas.jpg">
+     <h3>
+            <input type="radio" name="producto" value="Picadas Veracruzanas">
+            Picadas Veracruzanas - $20
+        </h3>
+    </div>
+
+    <h3>Datos</h3>
+    <input type="text" name="cliente" placeholder="Tu nombre" required>
+    <input type="text" name="direccion" placeholder="Dirección" required>
+
+    <br>
+    <button type="submit">Pedir ahora</button>
+
+</div>
+</form>
+
+</body>
+</html>
