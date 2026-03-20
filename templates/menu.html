@@ -187,25 +187,33 @@ function enviarPedido(event) {
         return false;
     }
     
-    // Crear el mensaje
-    let mensaje = `🍳 *Nuevo pedido - Desayunos Artur*%0a%0a`;
-    mensaje += `👤 *Cliente:* ${cliente}%0a`;
-    mensaje += `📍 *Dirección:* ${direccion}%0a`;
-    mensaje += `🍽️ *Producto:* ${productoSeleccionado.value}%0a%0a`;
-    mensaje += `🙏 ¡Gracias por tu pedido!`;
+    // Crear el mensaje (usando \n y encodeURIComponent)
+    let mensaje = "🍳 *Nuevo pedido - Desayunos Artur*\n\n" +
+                  "👤 *Cliente:* " + cliente + "\n" +
+                  "📍 *Dirección:* " + direccion + "\n" +
+                  "🍽️ *Producto:* " + productoSeleccionado.value + "\n\n" +
+                  "🙏 ¡Gracias por tu pedido!";
     
-    // Abrir WhatsApp
-    let url = `https://wa.me/${NUMERO_WHATSAPP}?text=${mensaje}`;
-    window.open(url, '_blank');
+    // Codificar el mensaje para la URL
+    let mensajeCodificado = encodeURIComponent(mensaje);
+    
+    // Crear URL de WhatsApp
+    let url = `https://wa.me/${NUMERO_WHATSAPP}?text=${mensajeCodificado}`;
+    
+    // Abrir WhatsApp (compatible con PWA)
+    window.location.href = url;
     
     return false;
 }
 
 // Función para contacto directo (sin pedido)
 function abrirWhatsAppDirecto() {
-    let mensaje = `Hola, quiero información sobre los desayunos`;
-    let url = `https://wa.me/${NUMERO_WHATSAPP}?text=${encodeURIComponent(mensaje)}`;
-    window.open(url, '_blank');
+    let mensaje = "Hola, quiero información sobre los desayunos";
+    let mensajeCodificado = encodeURIComponent(mensaje);
+    let url = `https://wa.me/${NUMERO_WHATSAPP}?text=${mensajeCodificado}`;
+    
+    // Abrir WhatsApp (compatible con PWA)
+    window.location.href = url;
 }
 </script>
 
