@@ -3,13 +3,13 @@
 <head>
     <title>Desayunos Artur</title>
 
-    
+    <!-- Iconos para la app -->
     <link rel="shortcut icon" href="/static/favicon.ico">
     <link rel="icon" type="image/png" sizes="192x192" href="/static/icon-192.png">
     <link rel="icon" type="image/png" sizes="512x512" href="/static/icon-512.png">
     <link rel="apple-touch-icon" href="/static/icon-192.png">
     
-    
+    <!-- Manifest para instalación -->
     <link rel="manifest" href="/manifest.json">
 
     <style>
@@ -91,6 +91,23 @@
         text-align: left;
         margin-top: 20px;
     }
+
+    /* Estilo para botón de WhatsApp */
+    .btn-whatsapp {
+        background: #25D366;
+        margin-top: 15px;
+    }
+    
+    .btn-whatsapp:hover {
+        background: #128C7E;
+    }
+
+    /* Separador visual */
+    .separador {
+        margin: 20px 0;
+        color: #999;
+        font-size: 14px;
+    }
     </style>
 </head>
 
@@ -98,43 +115,99 @@
 
 <h1>🍳 Desayunos Artur</h1>
 
-<form action="/pedido" method="POST">
+<form id="formularioPedido" onsubmit="return enviarPedido(event)">
 <div class="container">
 
+    <!-- Producto 1: Chilaquiles -->
     <div class="card">
         <img src="/static/chilaquiles.jpg">
         <h3>
-            <input type="radio" name="producto" value="Chilaquiles" required>
+            <input type="radio" name="producto" value="Chilaquiles - $130" required>
             Chilaquiles - $130
         </h3>
     </div>
 
+    <!-- Producto 2: Molletes -->
     <div class="card">
         <img src="/static/molletes.jpg">
         <h3>
-            <input type="radio" name="producto" value="Molletes">
+            <input type="radio" name="producto" value="Molletes - $75">
             Molletes - $75
         </h3>
     </div>
 
+    <!-- Producto 3: Picadas -->
     <div class="card">
         <img src="/static/picadas.jpg">
         <h3>
-            <input type="radio" name="producto" value="Picadas Veracruzanas">
+            <input type="radio" name="producto" value="Picadas Veracruzanas - $20">
             Picadas Veracruzanas - $20
         </h3>
     </div>
 
+    <!-- Datos del cliente -->
     <div class="datos-section">
         <h3>📝 Tus datos</h3>
-        <input type="text" name="cliente" placeholder="Tu nombre" required>
-        <input type="text" name="direccion" placeholder="Dirección" required>
+        <input type="text" id="cliente" name="cliente" placeholder="Tu nombre" required>
+        <input type="text" id="direccion" name="direccion" placeholder="Dirección" required>
     </div>
 
-    <button type="submit">Pedir ahora</button>
+    <!-- Botón de pedido (envía a WhatsApp) -->
+    <button type="submit" style="background: #25D366;">📱 Enviar pedido por WhatsApp</button>
+
+    <div class="separador">ó</div>
+
+    <!-- Botón de contacto directo -->
+    <button type="button" onclick="abrirWhatsAppDirecto()" style="background: #ff9800;">💬 Contactar por WhatsApp</button>
 
 </div>
 </form>
+
+<script>
+// Número de WhatsApp (código México 52 + número)
+const NUMERO_WHATSAPP = "5214461414743";
+
+// Función principal: cuando envían el formulario
+function enviarPedido(event) {
+    event.preventDefault();  // Evita que se envíe el formulario tradicional
+    
+    // Obtener el producto seleccionado
+    let productoSeleccionado = document.querySelector('input[name="producto"]:checked');
+    if (!productoSeleccionado) {
+        alert("Por favor selecciona un producto");
+        return false;
+    }
+    
+    // Obtener datos del cliente
+    let cliente = document.getElementById('cliente').value;
+    let direccion = document.getElementById('direccion').value;
+    
+    if (!cliente || !direccion) {
+        alert("Por favor completa todos tus datos");
+        return false;
+    }
+    
+    // Crear el mensaje
+    let mensaje = `🍳 *Nuevo pedido - Desayunos Artur*%0a%0a`;
+    mensaje += `👤 *Cliente:* ${cliente}%0a`;
+    mensaje += `📍 *Dirección:* ${direccion}%0a`;
+    mensaje += `🍽️ *Producto:* ${productoSeleccionado.value}%0a%0a`;
+    mensaje += `🙏 ¡Gracias por tu pedido!`;
+    
+    // Abrir WhatsApp
+    let url = `https://wa.me/${NUMERO_WHATSAPP}?text=${mensaje}`;
+    window.open(url, '_blank');
+    
+    return false;
+}
+
+// Función para contacto directo (sin pedido)
+function abrirWhatsAppDirecto() {
+    let mensaje = `Hola, quiero información sobre los desayunos`;
+    let url = `https://wa.me/${NUMERO_WHATSAPP}?text=${encodeURIComponent(mensaje)}`;
+    window.open(url, '_blank');
+}
+</script>
 
 </body>
 </html>
