@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, send_from_directory
 
 app = Flask(__name__)
 
@@ -22,11 +22,10 @@ def pedido():
         📲 Confirmar por WhatsApp
     </a>
     """
-from flask import send_from_directory
 
 @app.route('/manifest.json')
 def manifest():
     return send_from_directory('.', 'manifest.json')
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run()
