@@ -22,16 +22,17 @@ body{font-family:Arial,sans-serif;background:#f5f5f5;padding:20px;}
 .precio{color:#ff9800;font-weight:bold;margin-bottom:10px;}
 
 .controles{display:flex;justify-content:center;gap:20px;}
-.controles button{width:40px;height:40px;border:none;border-radius:50%;background:#ff9800;color:white;}
-.cantidad{font-weight:bold;}
+.controles button{width:40px;height:40px;border:none;border-radius:50%;background:#ff9800;color:white;font-size:18px;cursor:pointer;}
+.cantidad{font-weight:bold;font-size:18px;min-width:24px;text-align:center;}
 
 select{width:100%;padding:10px;border-radius:10px;margin-bottom:10px;}
 
 /* RESUMEN */
 .resumen{background:white;border-radius:16px;padding:16px;margin:20px 0;}
-.item{display:flex;justify-content:space-between;padding:8px 0;}
+.item{display:flex;justify-content:space-between;padding:8px 0;align-items:center;}
+.item button{background:#ff4444;color:white;border:none;border-radius:20px;padding:4px 12px;cursor:pointer;}
 
-#btnLimpiar{margin-top:10px;width:100%;background:#ff4444;color:white;border:none;padding:12px;border-radius:10px;display:none;}
+#btnLimpiar{margin-top:10px;width:100%;background:#ff4444;color:white;border:none;padding:12px;border-radius:10px;cursor:pointer;}
 
 /* DATOS */
 .datos{background:white;border-radius:16px;padding:16px;margin:20px 0;}
@@ -50,9 +51,10 @@ padding:16px;
 font-size:18px;
 font-weight:bold;
 cursor:pointer;
+box-shadow:0 4px 12px rgba(0,0,0,0.2);
 }
 
-/* 🔥 MODAL PRO */
+/* MODAL */
 .modal{
 display:none;
 position:fixed;
@@ -126,7 +128,7 @@ cursor:pointer;
 <div class="container">
 
 <div class="logo-container">
-<img src="/static/favicon.ico">
+<img src="/static/favicon.ico" alt="Logo" onerror="this.src='https://via.placeholder.com/80?text=Artur'">
 <h1>Desayunos Artur</h1>
 </div>
 
@@ -149,12 +151,20 @@ cursor:pointer;
 
 </div>
 
-<!-- MODAL -->
+<!-- MODAL CON MÉTODO DE PAGO -->
 <div id="modalResumen" class="modal">
 <div class="modal-content">
 <h3>🧾 Resumen del pedido</h3>
 <div id="modal-contenido"></div>
 <div class="modal-total" id="modal-total"></div>
+
+<!-- MÉTODO DE PAGO AGREGADO -->
+<h4>💳 Método de pago</h4>
+<select id="metodoPago">
+<option value="Efectivo">💵 Efectivo</option>
+<option value="Transferencia">🏦 Transferencia</option>
+<option value="Tarjeta">💳 Tarjeta</option>
+</select>
 
 <div class="modal-buttons">
 <button class="btn-cancelar" onclick="cerrarModal()">Cancelar</button>
@@ -164,159 +174,212 @@ cursor:pointer;
 </div>
 
 <script>
-const TELEFONO="5214461414743";
+const TELEFONO = "5214461414743";
 
-const productos=[
-{id:0,nombre:"Chilaquiles",precio:130,img:"/static/chilaquiles.jpg",opciones:["Verdes","Rojos"]},
-{id:1,nombre:"Molletes",precio:75,img:"/static/molletes.jpg",opciones:null},
-{id:2,nombre:"Picadas Veracruzanas",precio:20,img:"/static/picadas.jpg",opciones:["Verde","Roja"]},
-{id:3,nombre:"Hotcakes",precio:60,img:"/static/hotcakes.jpg",opciones:null}
+const productos = [
+  {id:0, nombre:"Chilaquiles", precio:130, img:"/static/chilaquiles.jpg", opciones:["Verdes","Rojos"]},
+  {id:1, nombre:"Molletes", precio:75, img:"/static/molletes.jpg", opciones:null},
+  {id:2, nombre:"Picadas Veracruzanas", precio:20, img:"/static/picadas.jpg", opciones:["Verde","Roja"]},
+  {id:3, nombre:"Hotcakes", precio:60, img:"/static/hotcakes.jpg", opciones:null}
 ];
 
-let carrito={};
+let carrito = {};
 
-document.getElementById('telefono').addEventListener('input',e=>{
-e.target.value=e.target.value.replace(/\D/g,'').slice(0,10);
+document.getElementById('telefono').addEventListener('input', e => {
+  e.target.value = e.target.value.replace(/\D/g, '').slice(0, 10);
 });
 
-function renderMenu(){
-const menu=document.getElementById('menu');
-menu.innerHTML='';
-productos.forEach(p=>{
-let selectHTML='';
-if(p.opciones){
-selectHTML=`<select id="select-${p.id}">
-${p.opciones.map(op=>`<option>${op}</option>`).join('')}
-</select>`;
+function renderMenu() {
+  const menu = document.getElementById('menu');
+  menu.innerHTML = '';
+  productos.forEach(p => {
+    let selectHTML = '';
+    if (p.opciones) {
+      selectHTML = `<select id="select-${p.id}">
+        ${p.opciones.map(op => `<option>${op}</option>`).join('')}
+      </select>`;
+    }
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.innerHTML = `
+      <img src="${p.img}" alt="${p.nombre}" onerror="this.src='https://via.placeholder.com/400x200?text=${encodeURIComponent(p.nombre)}'">
+      <div class="card-info">
+        <h3>${p.nombre}</h3>
+        <div class="precio">$${p.precio}</div>
+        ${selectHTML}
+        <div class="controles">
+          <button onclick="cambiarCantidad(${p.id}, -1)">−</button>
+          <span id="cant-${p.id}" class="cantidad">0</span>
+          <button onclick="cambiarCantidad(${p.id}, 1)">+</button>
+        </div>
+      </div>`;
+    menu.appendChild(card);
+  });
 }
-const card=document.createElement('div');
-card.className='card';
-card.innerHTML=`
-<img src="${p.img}">
-<div class="card-info">
-<h3>${p.nombre}</h3>
-<div class="precio">$${p.precio}</div>
-${selectHTML}
-<div class="controles">
-<button onclick="cambiarCantidad(${p.id},-1)">−</button>
-<span id="cant-${p.id}" class="cantidad">0</span>
-<button onclick="cambiarCantidad(${p.id},1)">+</button>
-</div>
-</div>`;
-menu.appendChild(card);
+
+function cambiarCantidad(id, delta) {
+  const p = productos[id];
+  let op = null;
+  if (p.opciones) {
+    op = document.getElementById(`select-${id}`).value;
+  }
+  const key = p.nombre + (op ? ` ${op}` : '');
+
+  if (!carrito[key]) {
+    carrito[key] = { precio: p.precio, cantidad: 0 };
+  }
+
+  carrito[key].cantidad += delta;
+
+  if (carrito[key].cantidad <= 0) {
+    delete carrito[key];
+  }
+
+  const spanCantidad = document.getElementById(`cant-${id}`);
+  if (spanCantidad) {
+    spanCantidad.innerText = carrito[key]?.cantidad || 0;
+  }
+
+  actualizarUI();
+}
+
+function actualizarUI() {
+  const resumen = document.getElementById('resumen');
+  const lista = document.getElementById('lista-pedido');
+  const btnLimpiar = document.getElementById('btnLimpiar');
+
+  let total = 0;
+  lista.innerHTML = '';
+
+  if (Object.keys(carrito).length === 0) {
+    resumen.style.display = 'none';
+    btnLimpiar.style.display = 'none';
+  } else {
+    resumen.style.display = 'block';
+    btnLimpiar.style.display = 'block';
+
+    Object.entries(carrito).forEach(([k, item]) => {
+      const sub = item.precio * item.cantidad;
+      total += sub;
+      lista.innerHTML += `
+        <div class="item">
+          ${k} x${item.cantidad} = $${sub}
+          <button onclick="eliminarItem('${k.replace(/'/g, "\\'")}')">✖</button>
+        </div>`;
+    });
+  }
+
+  document.getElementById('btnFlotante').innerText = `🛒 Ver pedido ($${total})`;
+}
+
+function eliminarItem(k) {
+  delete carrito[k];
+  actualizarUI();
+}
+
+function limpiarPedido() {
+  if (!confirm("¿Limpiar pedido?")) return;
+  carrito = {};
+  productos.forEach(p => {
+    const span = document.getElementById(`cant-${p.id}`);
+    if (span) span.innerText = 0;
+  });
+  actualizarUI();
+}
+
+document.addEventListener('change', (e) => {
+  if (e.target.id && e.target.id.startsWith('select-')) {
+    const id = parseInt(e.target.id.split('-')[1]);
+    const p = productos.find(x => x.id === id);
+    if (p) {
+      const op = e.target.value;
+      const key = p.nombre + " " + op;
+      const span = document.getElementById(`cant-${id}`);
+      if (span) {
+        span.innerText = carrito[key]?.cantidad || 0;
+      }
+    }
+  }
 });
-}
 
-function cambiarCantidad(id,delta){
-const p=productos[id];
-let op=null;
-if(p.opciones){op=document.getElementById(`select-${id}`).value;}
-const key=p.nombre+(op?` ${op}`:'');
-
-if(!carrito[key])carrito[key]={precio:p.precio,cantidad:0};
-
-carrito[key].cantidad+=delta;
-
-if(carrito[key].cantidad<=0)delete carrito[key];
-
-document.getElementById(`cant-${id}`).innerText=carrito[key]?.cantidad||0;
-
-actualizarUI();
-}
-
-function actualizarUI(){
-const resumen=document.getElementById('resumen');
-const lista=document.getElementById('lista-pedido');
-const btnLimpiar=document.getElementById('btnLimpiar');
-
-let total=0;
-lista.innerHTML='';
-
-if(Object.keys(carrito).length===0){
-resumen.style.display='none';
-btnLimpiar.style.display='none';
-}else{
-resumen.style.display='block';
-btnLimpiar.style.display='block';
-
-Object.entries(carrito).forEach(([k,item])=>{
-const sub=item.precio*item.cantidad;
-total+=sub;
-lista.innerHTML+=`
-<div class="item">
-${k} x${item.cantidad} = $${sub}
-<button onclick="eliminarItem('${k}')">✖</button>
-</div>`;
-});
-}
-
-document.getElementById('btnFlotante').innerText=`🛒 Ver pedido ($${total})`;
-}
-
-function eliminarItem(k){
-delete carrito[k];
-actualizarUI();
-}
-
-function limpiarPedido(){
-if(!confirm("¿Limpiar pedido?"))return;
-carrito={};
-productos.forEach(p=>{
-document.getElementById(`cant-${p.id}`).innerText=0;
-});
-actualizarUI();
-}
-
-/* FIX SELECT */
-document.addEventListener('change',(e)=>{
-if(e.target.id.startsWith('select-')){
-const id=parseInt(e.target.id.split('-')[1]);
-const p=productos.find(x=>x.id===id);
-const op=e.target.value;
-const key=p.nombre+" "+op;
-document.getElementById(`cant-${id}`).innerText=carrito[key]?.cantidad||0;
-}
-});
-
-document.getElementById('btnFlotante').onclick=()=>{
-if(Object.keys(carrito).length===0){
-alert("No hay productos");
-return;
-}
-mostrarModalResumen();
+document.getElementById('btnFlotante').onclick = () => {
+  if (Object.keys(carrito).length === 0) {
+    alert("🛒 No hay productos en tu pedido");
+    return;
+  }
+  mostrarModalResumen();
 };
 
-function mostrarModalResumen(){
-const modal=document.getElementById('modalResumen');
-const contenido=document.getElementById('modal-contenido');
-const totalDiv=document.getElementById('modal-total');
+function mostrarModalResumen() {
+  const modal = document.getElementById('modalResumen');
+  const contenido = document.getElementById('modal-contenido');
+  const totalDiv = document.getElementById('modal-total');
 
-modal.style.display='flex';
+  let html = "";
+  let total = 0;
 
-let html="",total=0;
+  Object.entries(carrito).forEach(([k, i]) => {
+    const sub = i.precio * i.cantidad;
+    total += sub;
+    html += `<div class="modal-item"><span>${k} x${i.cantidad}</span><span>$${sub}</span></div>`;
+  });
 
-Object.entries(carrito).forEach(([k,i])=>{
-const sub=i.precio*i.cantidad;
-total+=sub;
-html+=`<div class="modal-item"><span>${k} x${i.cantidad}</span><span>$${sub}</span></div>`;
-});
-
-contenido.innerHTML=html;
-totalDiv.innerHTML=`Total: $${total}`;
+  contenido.innerHTML = html;
+  totalDiv.innerHTML = `Total: $${total}`;
+  modal.style.display = 'flex';
 }
 
-function cerrarModal(){
-document.getElementById('modalResumen').style.display='none';
+function cerrarModal() {
+  document.getElementById('modalResumen').style.display = 'none';
 }
 
-function confirmarEnvio(){
-let msg="Pedido:\n";
-Object.entries(carrito).forEach(([k,i])=>{
-msg+=`${k} x${i.cantidad}\n`;
-});
-window.open(`https://wa.me/${TELEFONO}?text=${encodeURIComponent(msg)}`);
+// ========== FUNCIÓN CORREGIDA CON EL FORMATO EXACTO ==========
+function confirmarEnvio() {
+  // Obtener datos del cliente
+  let nombre = document.getElementById('nombre').value.trim();
+  let direccion = document.getElementById('direccion').value.trim();
+  let telefono = document.getElementById('telefono').value.trim();
+  let metodo = document.getElementById('metodoPago').value;
+
+  // Validar datos
+  if (!nombre || !direccion || telefono.length < 10) {
+    alert("❌ Completa todos tus datos correctamente (nombre, dirección y teléfono de 10 dígitos).");
+    return;
+  }
+
+  // Construir mensaje con el formato exacto
+  let msg = "";
+  msg += "🍳 *Nuevo pedido - Desayunos Artur*\n\n";
+  msg += `👤 Cliente: ${nombre}\n`;
+  msg += `📍 Dirección: ${direccion}\n`;
+  msg += `📞 Teléfono: ${telefono}\n\n`;
+
+  msg += "🛒 Pedido:\n";
+  msg += "━━━━━━━━━━━━━━━━━━━━━\n";
+
+  let total = 0;
+
+  // Recorrer productos del carrito
+  Object.entries(carrito).forEach(([nombreProducto, item]) => {
+    const subtotal = item.precio * item.cantidad;
+    total += subtotal;
+    // Formato: "* Chilaquiles Verdes ×1 = $130"
+    msg += `* ${nombreProducto} ×${item.cantidad} = $${subtotal}\n`;
+  });
+
+  msg += "━━━━━━━━━━━━━━━━━━━━━\n";
+  msg += `💰 Total: $${total}\n`;
+  msg += `💳 Método de pago: ${metodo}`;
+
+  // Abrir WhatsApp
+  const urlWA = `https://wa.me/${TELEFONO}?text=${encodeURIComponent(msg)}`;
+  window.open(urlWA);
+
+  // Cerrar modal después de enviar
+  cerrarModal();
 }
 
+// Inicializar
 renderMenu();
 </script>
 
