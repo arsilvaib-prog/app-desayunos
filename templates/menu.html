@@ -1,220 +1,323 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
-    <title>Desayunos Artur</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Desayunos Artur</title>
 
-    <!-- Iconos para la app -->
-    <link rel="shortcut icon" href="/static/favicon.ico">
-    <link rel="icon" type="image/png" sizes="192x192" href="/static/icon-192.png">
-    <link rel="icon" type="image/png" sizes="512x512" href="/static/icon-512.png">
-    <link rel="apple-touch-icon" href="/static/icon-192.png">
-    
-    <!-- Manifest para instalación -->
-    <link rel="manifest" href="/manifest.json">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:Arial,sans-serif;background:#f5f5f5;padding:20px;}
+.container{max-width:500px;margin:0 auto;}
 
-    <style>
-    body {
-        font-family: Arial;
-        background: #f5f5f5;
-        text-align: center;
-        margin: 0;
-        padding: 20px;
-    }
+/* LOGO */
+.logo-container{text-align:center;margin-bottom:20px;}
+.logo-container img{width:80px;height:80px;border-radius:20px;}
+.logo-container h1{color:#ff9800;}
 
-    h1 {
-        color: #ff9800;
-    }
+/* CARD */
+.card{background:white;border-radius:20px;margin-bottom:20px;overflow:hidden;box-shadow:0 6px 16px rgba(0,0,0,0.15);}
+.card img{width:100%;height:200px;object-fit:cover;}
+.card-info{padding:20px;}
+.precio{color:#ff9800;font-weight:bold;margin-bottom:10px;}
 
-    .container {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        max-width: 400px;
-        margin: 0 auto;
-    }
+.controles{display:flex;justify-content:center;gap:20px;}
+.controles button{width:40px;height:40px;border:none;border-radius:50%;background:#ff9800;color:white;}
+.cantidad{font-weight:bold;}
 
-    .card {
-        background: white;
-        padding: 15px;
-        margin: 10px 0;
-        border-radius: 10px;
-        width: 100%;
-        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-    }
+select{width:100%;padding:10px;border-radius:10px;margin-bottom:10px;}
 
-    img {
-        width: 100%;
-        height: 180px;
-        object-fit: cover;
-        border-radius: 10px;
-    }
+/* RESUMEN */
+.resumen{background:white;border-radius:16px;padding:16px;margin:20px 0;}
+.item{display:flex;justify-content:space-between;padding:8px 0;}
 
-    button {
-        background: #ff9800;
-        color: white;
-        padding: 15px;
-        border: none;
-        border-radius: 5px;
-        width: 100%;
-        font-size: 18px;
-        font-weight: bold;
-        cursor: pointer;
-        margin-top: 10px;
-    }
+#btnLimpiar{margin-top:10px;width:100%;background:#ff4444;color:white;border:none;padding:12px;border-radius:10px;display:none;}
 
-    button:hover {
-        background: #f57c00;
-    }
+/* DATOS */
+.datos{background:white;border-radius:16px;padding:16px;margin:20px 0;}
+input{width:100%;padding:12px;margin-bottom:10px;border-radius:10px;border:1px solid #ddd;}
 
-    input[type="text"] {
-        width: 100%;
-        padding: 12px;
-        margin: 8px 0;
-        border: 1px solid #ddd;
-        border-radius: 5px;
-        box-sizing: border-box;
-    }
+/* BOTÓN */
+.btn-flotante{
+width:100%;
+margin:20px auto;
+display:block;
+background:#25D366;
+color:white;
+border:none;
+border-radius:50px;
+padding:16px;
+font-size:18px;
+font-weight:bold;
+cursor:pointer;
+}
 
-    input[type="radio"] {
-        margin-right: 10px;
-        transform: scale(1.2);
-    }
+/* 🔥 MODAL PRO */
+.modal{
+display:none;
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:rgba(0,0,0,0.6);
+z-index:2000;
+justify-content:center;
+align-items:center;
+backdrop-filter:blur(4px);
+}
 
-    h3 {
-        display: flex;
-        align-items: center;
-        margin: 10px 0;
-    }
+.modal-content{
+background:white;
+border-radius:20px;
+width:90%;
+max-width:420px;
+padding:20px;
+animation:aparecer .3s ease;
+}
 
-    .datos-section {
-        width: 100%;
-        text-align: left;
-        margin-top: 20px;
-    }
+@keyframes aparecer{
+from{transform:scale(.9);opacity:0;}
+to{transform:scale(1);opacity:1;}
+}
 
-    /* Estilo para botón de WhatsApp */
-    .btn-whatsapp {
-        background: #25D366;
-        margin-top: 15px;
-    }
-    
-    .btn-whatsapp:hover {
-        background: #128C7E;
-    }
+.modal-content h3{
+text-align:center;
+color:#ff9800;
+margin-bottom:15px;
+}
 
-    /* Separador visual */
-    .separador {
-        margin: 20px 0;
-        color: #999;
-        font-size: 14px;
-    }
-    </style>
+.modal-item{
+display:flex;
+justify-content:space-between;
+padding:10px 0;
+border-bottom:1px solid #eee;
+}
+
+.modal-total{
+text-align:right;
+font-size:20px;
+font-weight:bold;
+margin-top:15px;
+}
+
+.modal-buttons{
+display:flex;
+gap:10px;
+margin-top:20px;
+}
+
+.modal-buttons button{
+flex:1;
+padding:12px;
+border:none;
+border-radius:10px;
+font-weight:bold;
+cursor:pointer;
+}
+
+.btn-cancelar{background:#ff4444;color:white;}
+.btn-confirmar{background:#25D366;color:white;}
+</style>
 </head>
 
 <body>
 
-<h1>🍳 Desayunos Artur</h1>
-
-<form id="formularioPedido" onsubmit="return enviarPedido(event)">
 <div class="container">
 
-    <!-- Producto 1: Chilaquiles -->
-    <div class="card">
-        <img src="/static/chilaquiles.jpg">
-        <h3>
-            <input type="radio" name="producto" value="Chilaquiles - $130" required>
-            Chilaquiles - $130
-        </h3>
-    </div>
+<div class="logo-container">
+<img src="/static/favicon.ico">
+<h1>Desayunos Artur</h1>
+</div>
 
-    <!-- Producto 2: Molletes -->
-    <div class="card">
-        <img src="/static/molletes.jpg">
-        <h3>
-            <input type="radio" name="producto" value="Molletes - $75">
-            Molletes - $75
-        </h3>
-    </div>
+<div id="menu"></div>
 
-    <!-- Producto 3: Picadas -->
-    <div class="card">
-        <img src="/static/picadas.jpg">
-        <h3>
-            <input type="radio" name="producto" value="Picadas Veracruzanas - $20">
-            Picadas Veracruzanas - $20
-        </h3>
-    </div>
+<div id="resumen" class="resumen" style="display:none;">
+<h3>🛒 Tu pedido</h3>
+<div id="lista-pedido"></div>
+<button id="btnLimpiar" onclick="limpiarPedido()">🗑️ Limpiar pedido</button>
+</div>
 
-    <!-- Datos del cliente -->
-    <div class="datos-section">
-        <h3>📝 Tus datos</h3>
-        <input type="text" id="cliente" name="cliente" placeholder="Tu nombre" required>
-        <input type="text" id="direccion" name="direccion" placeholder="Dirección" required>
-    </div>
+<div class="datos">
+<h3>📝 Tus datos</h3>
+<input type="text" id="nombre" placeholder="Tu nombre">
+<input type="text" id="direccion" placeholder="Dirección">
+<input type="tel" id="telefono" placeholder="Teléfono" maxlength="10">
+</div>
 
-    <!-- Botón de pedido (envía a WhatsApp) -->
-    <button type="submit" style="background: #25D366;">📱 Enviar pedido por WhatsApp</button>
-
-    <div class="separador">ó</div>
-
-    <!-- Botón de contacto directo -->
-    <button type="button" onclick="abrirWhatsAppDirecto()" style="background: #ff9800;">💬 Contactar por WhatsApp</button>
+<button id="btnFlotante" class="btn-flotante">🛒 Ver pedido ($0)</button>
 
 </div>
-</form>
+
+<!-- MODAL -->
+<div id="modalResumen" class="modal">
+<div class="modal-content">
+<h3>🧾 Resumen del pedido</h3>
+<div id="modal-contenido"></div>
+<div class="modal-total" id="modal-total"></div>
+
+<div class="modal-buttons">
+<button class="btn-cancelar" onclick="cerrarModal()">Cancelar</button>
+<button class="btn-confirmar" onclick="confirmarEnvio()">Enviar</button>
+</div>
+</div>
+</div>
 
 <script>
-// Número de WhatsApp (código México 52 + número)
-const NUMERO_WHATSAPP = "5214461414743";
+const TELEFONO="5214461414743";
 
-// Función principal: cuando envían el formulario
-function enviarPedido(event) {
-    event.preventDefault();  // Evita que se envíe el formulario tradicional
-    
-    // Obtener el producto seleccionado
-    let productoSeleccionado = document.querySelector('input[name="producto"]:checked');
-    if (!productoSeleccionado) {
-        alert("Por favor selecciona un producto");
-        return false;
-    }
-    
-    // Obtener datos del cliente
-    let cliente = document.getElementById('cliente').value;
-    let direccion = document.getElementById('direccion').value;
-    
-    if (!cliente || !direccion) {
-        alert("Por favor completa todos tus datos");
-        return false;
-    }
-    
-    // Crear el mensaje (usando \n y encodeURIComponent)
-    let mensaje = "🍳 *Nuevo pedido - Desayunos Artur*\n\n" +
-                  "👤 *Cliente:* " + cliente + "\n" +
-                  "📍 *Dirección:* " + direccion + "\n" +
-                  "🍽️ *Producto:* " + productoSeleccionado.value + "\n\n" +
-                  "🙏 ¡Gracias por tu pedido!";
-    
-    // Codificar el mensaje para la URL
-    let mensajeCodificado = encodeURIComponent(mensaje);
-    
-    // Crear URL de WhatsApp
-    let url = `https://wa.me/${NUMERO_WHATSAPP}?text=${mensajeCodificado}`;
-    
-    // Abrir WhatsApp (compatible con PWA)
-    window.location.href = url;
-    
-    return false;
+const productos=[
+{id:0,nombre:"Chilaquiles",precio:130,img:"/static/chilaquiles.jpg",opciones:["Verdes","Rojos"]},
+{id:1,nombre:"Molletes",precio:75,img:"/static/molletes.jpg",opciones:null},
+{id:2,nombre:"Picadas Veracruzanas",precio:20,img:"/static/picadas.jpg",opciones:["Verde","Roja"]},
+{id:3,nombre:"Hotcakes",precio:60,img:"/static/hotcakes.jpg",opciones:null}
+];
+
+let carrito={};
+
+document.getElementById('telefono').addEventListener('input',e=>{
+e.target.value=e.target.value.replace(/\D/g,'').slice(0,10);
+});
+
+function renderMenu(){
+const menu=document.getElementById('menu');
+menu.innerHTML='';
+productos.forEach(p=>{
+let selectHTML='';
+if(p.opciones){
+selectHTML=`<select id="select-${p.id}">
+${p.opciones.map(op=>`<option>${op}</option>`).join('')}
+</select>`;
+}
+const card=document.createElement('div');
+card.className='card';
+card.innerHTML=`
+<img src="${p.img}">
+<div class="card-info">
+<h3>${p.nombre}</h3>
+<div class="precio">$${p.precio}</div>
+${selectHTML}
+<div class="controles">
+<button onclick="cambiarCantidad(${p.id},-1)">−</button>
+<span id="cant-${p.id}" class="cantidad">0</span>
+<button onclick="cambiarCantidad(${p.id},1)">+</button>
+</div>
+</div>`;
+menu.appendChild(card);
+});
 }
 
-// Función para contacto directo (sin pedido)
-function abrirWhatsAppDirecto() {
-    let mensaje = "Hola, quiero información sobre los desayunos";
-    let mensajeCodificado = encodeURIComponent(mensaje);
-    let url = `https://wa.me/${NUMERO_WHATSAPP}?text=${mensajeCodificado}`;
-    
-    // Abrir WhatsApp (compatible con PWA)
-    window.location.href = url;
+function cambiarCantidad(id,delta){
+const p=productos[id];
+let op=null;
+if(p.opciones){op=document.getElementById(`select-${id}`).value;}
+const key=p.nombre+(op?` ${op}`:'');
+
+if(!carrito[key])carrito[key]={precio:p.precio,cantidad:0};
+
+carrito[key].cantidad+=delta;
+
+if(carrito[key].cantidad<=0)delete carrito[key];
+
+document.getElementById(`cant-${id}`).innerText=carrito[key]?.cantidad||0;
+
+actualizarUI();
 }
+
+function actualizarUI(){
+const resumen=document.getElementById('resumen');
+const lista=document.getElementById('lista-pedido');
+const btnLimpiar=document.getElementById('btnLimpiar');
+
+let total=0;
+lista.innerHTML='';
+
+if(Object.keys(carrito).length===0){
+resumen.style.display='none';
+btnLimpiar.style.display='none';
+}else{
+resumen.style.display='block';
+btnLimpiar.style.display='block';
+
+Object.entries(carrito).forEach(([k,item])=>{
+const sub=item.precio*item.cantidad;
+total+=sub;
+lista.innerHTML+=`
+<div class="item">
+${k} x${item.cantidad} = $${sub}
+<button onclick="eliminarItem('${k}')">✖</button>
+</div>`;
+});
+}
+
+document.getElementById('btnFlotante').innerText=`🛒 Ver pedido ($${total})`;
+}
+
+function eliminarItem(k){
+delete carrito[k];
+actualizarUI();
+}
+
+function limpiarPedido(){
+if(!confirm("¿Limpiar pedido?"))return;
+carrito={};
+productos.forEach(p=>{
+document.getElementById(`cant-${p.id}`).innerText=0;
+});
+actualizarUI();
+}
+
+/* FIX SELECT */
+document.addEventListener('change',(e)=>{
+if(e.target.id.startsWith('select-')){
+const id=parseInt(e.target.id.split('-')[1]);
+const p=productos.find(x=>x.id===id);
+const op=e.target.value;
+const key=p.nombre+" "+op;
+document.getElementById(`cant-${id}`).innerText=carrito[key]?.cantidad||0;
+}
+});
+
+document.getElementById('btnFlotante').onclick=()=>{
+if(Object.keys(carrito).length===0){
+alert("No hay productos");
+return;
+}
+mostrarModalResumen();
+};
+
+function mostrarModalResumen(){
+const modal=document.getElementById('modalResumen');
+const contenido=document.getElementById('modal-contenido');
+const totalDiv=document.getElementById('modal-total');
+
+modal.style.display='flex';
+
+let html="",total=0;
+
+Object.entries(carrito).forEach(([k,i])=>{
+const sub=i.precio*i.cantidad;
+total+=sub;
+html+=`<div class="modal-item"><span>${k} x${i.cantidad}</span><span>$${sub}</span></div>`;
+});
+
+contenido.innerHTML=html;
+totalDiv.innerHTML=`Total: $${total}`;
+}
+
+function cerrarModal(){
+document.getElementById('modalResumen').style.display='none';
+}
+
+function confirmarEnvio(){
+let msg="Pedido:\n";
+Object.entries(carrito).forEach(([k,i])=>{
+msg+=`${k} x${i.cantidad}\n`;
+});
+window.open(`https://wa.me/${TELEFONO}?text=${encodeURIComponent(msg)}`);
+}
+
+renderMenu();
 </script>
 
 </body>
